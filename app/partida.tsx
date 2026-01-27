@@ -1,4 +1,4 @@
-import { useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
 // Imports de SVG
@@ -10,12 +10,13 @@ import Tablero from "../assets/images/tablero.svg";
 export default function Partida() {
 
   const router = useRouter();
-
+  const { nombre, dificultad } = useLocalSearchParams(); // Parámetro dificultad recibido del screen anterior
+  
   return (
     <View
       style={styles.container}
     >
-      <LogoApp width={200} height={140} style={{marginTop: 20}} />
+      <LogoApp width={200} height={140} style={{ marginTop: 20 }} />
       <View style={styles.contenedorInfo}>
         <View style={styles.contenedor}>
           <Text style={styles.texto}>Tiempo: </Text>

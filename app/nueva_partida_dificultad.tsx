@@ -1,4 +1,4 @@
-import { useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
 // Imports de SVG
@@ -8,6 +8,8 @@ import LogoApp from "../assets/images/logoApp.svg";
 export default function NuevaPartidaDificultad() {
 
     const router = useRouter();
+    const { nombre } = useLocalSearchParams(); // Parámetro dificultad recibido del screen anterior
+
 
     return (
         <View
@@ -19,10 +21,16 @@ export default function NuevaPartidaDificultad() {
             </View>
             <Text style={styles.textoGrande}>Selecciona la dicultad de juego:</Text>
             <Text style={styles.texto}>En función de la dificultad seleccionada se aplicarán cambios al comportamiento de la IA.</Text>
-            <Pressable style={styles.boton} onPress={() => router.push("/partida")}>
+            <Pressable style={styles.boton} onPress={() => router.push({ // Envío de parámetros a la siguiente screen
+                pathname: "/partida",
+                params: { dificultad: "facil", nombre: nombre }
+            })}>
                 <Text style={styles.textoBoton}>Fácil</Text>
             </Pressable>
-            <Pressable style={styles.botonInferior} onPress={() => router.push("/partida")}>
+            <Pressable style={styles.boton} onPress={() => router.push({ // Envío de parámetros a la siguiente screen
+                pathname: "/partida",
+                params: { dificultad: "dificil", nombre: nombre }
+            })}>
                 <Text style={styles.textoBoton}>Difícil</Text>
             </Pressable>
         </View>

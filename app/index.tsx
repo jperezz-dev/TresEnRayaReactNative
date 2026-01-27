@@ -7,7 +7,7 @@ import LogoApp from "../assets/images/logoApp.svg";
 export default function Index() {
 
   const router = useRouter();
-
+  
   return (
     <View
       style={styles.container}

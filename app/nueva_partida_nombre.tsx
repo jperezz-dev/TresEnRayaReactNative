@@ -1,4 +1,5 @@
 import { useRouter } from "expo-router";
+import React, { useState } from "react";
 import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 
 // Imports de SVG
@@ -8,6 +9,7 @@ import LogoApp from "../assets/images/logoApp.svg";
 export default function NuevaPartidaNombre() {
 
     const router = useRouter();
+    const [nombre, setNombre] = useState('');
 
     return (
         <View
@@ -18,9 +20,13 @@ export default function NuevaPartidaNombre() {
                 <LogoApp width={200} height={180} style={{ marginLeft: 30 }} />
             </View>
             <Text style={styles.textoGrande}>Introduce tu nombre de jugador:</Text>
-            <TextInput style={styles.introducirTexto}></TextInput>
+            <TextInput style={styles.introducirTexto} placeholder="Introduce tu nombre..." onChangeText={(texto) => setNombre(texto)}></TextInput>
             <Text style={styles.texto}>El nombre introducido es el que se mostrará en la tabla de resultados una vez finalice la partida.</Text>
-            <Pressable style={styles.boton} onPress={() => router.push("/nueva_partida_dificultad")} >
+            <Pressable style={styles.boton} onPress={() => router.push({
+                pathname: "/nueva_partida_dificultad",
+                params: { nombreJugador: nombre }
+            })
+            } >
                 <Text style={styles.textoBoton}>Siguiente</Text>
             </Pressable>
         </View>

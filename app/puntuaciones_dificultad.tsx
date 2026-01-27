@@ -19,10 +19,16 @@ export default function PuntuacionesDificultad() {
             </View>
             <Text style={styles.textoGrande}>¿Que puntuaciones quieres visualizar?</Text>
             <Text style={styles.texto}>Las puntuaciones se almacenan de forma independiente en función de la dificultad de la partida.</Text>
-            <Pressable style={styles.boton} onPress={() => router.push("/puntuaciones")}>
+            <Pressable style={styles.boton} onPress={() => router.push({
+                pathname: "/puntuaciones",
+                params: { dificultad: "facil" }
+            })}>
                 <Text style={styles.textoBoton}>Fácil</Text>
             </Pressable>
-            <Pressable style={styles.botonInferior} onPress={() => router.push("/puntuaciones")}>
+            <Pressable style={styles.boton} onPress={() => router.push({
+                pathname: "/puntuaciones",
+                params: { dificultad: "dificil" }
+            })}>
                 <Text style={styles.textoBoton}>Difícil</Text>
             </Pressable>
         </View>

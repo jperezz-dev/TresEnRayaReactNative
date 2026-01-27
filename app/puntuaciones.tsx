@@ -1,4 +1,4 @@
-import { useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { StyleSheet, Text, View } from "react-native";
 
 // Imports de SVG
@@ -8,6 +8,7 @@ import LogoApp from "../assets/images/logoApp.svg";
 export default function Puntuaciones() {
 
     const router = useRouter();
+    const {dificultad} = useLocalSearchParams();
 
     return (
         <View
