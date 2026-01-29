@@ -1,4 +1,4 @@
-import { useLocalSearchParams, useRouter } from "expo-router";
+import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import { StyleSheet, Text, View } from "react-native";
 
 // Imports de SVG
@@ -8,12 +8,13 @@ import LogoApp from "../assets/images/logoApp.svg";
 export default function Puntuaciones() {
 
     const router = useRouter();
-    const {dificultad} = useLocalSearchParams();
+    const { dificultad } = useLocalSearchParams();
 
     return (
         <View
             style={styles.container}
         >
+            <Stack.Screen options={{ headerShown: false }} />
             <View style={styles.contenedorSuperior}>
                 <BotonAtras width={20} height={20} onPress={() => router.push("/puntuaciones_dificultad")} />
                 <LogoApp width={200} height={180} style={{ marginLeft: 30 }} />
@@ -33,7 +34,7 @@ const styles = StyleSheet.create({
         alignItems: "center",
     },
     contenedorSuperior: {
-        marginTop: 52,
+        marginTop: 92,
         marginBottom: 80,
         flexDirection: "row",
         width: 300,

@@ -1,4 +1,4 @@
-import { useRouter } from "expo-router";
+import { Stack, useRouter } from "expo-router";
 import React, { useState } from "react";
 import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 
@@ -15,6 +15,7 @@ export default function NuevaPartidaNombre() {
         <View
             style={styles.container}
         >
+            <Stack.Screen options={{ headerShown: false }} />
             <View style={styles.contenedorSuperior}>
                 <BotonAtras width={20} height={20} onPress={() => router.push("/")} />
                 <LogoApp width={200} height={180} style={{ marginLeft: 30 }} />
@@ -40,6 +41,7 @@ const styles = StyleSheet.create({
         justifyContent: "space-evenly"
     },
     contenedorSuperior: {
+        marginTop: 40,
         flexDirection: "row",
         width: 300
     },

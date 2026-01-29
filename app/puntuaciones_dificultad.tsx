@@ -1,4 +1,4 @@
-import { useRouter } from "expo-router";
+import { Stack, useRouter } from "expo-router";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
 // Imports de SVG
@@ -13,6 +13,7 @@ export default function PuntuacionesDificultad() {
         <View
             style={styles.container}
         >
+            <Stack.Screen options={{ headerShown: false }} />
             <View style={styles.contenedorSuperior}>
                 <BotonAtras width={20} height={20} onPress={() => router.push("/")} />
                 <LogoApp width={200} height={180} style={{ marginLeft: 30 }} />
@@ -44,13 +45,13 @@ const styles = StyleSheet.create({
         justifyContent: "space-evenly"
     },
     contenedorSuperior: {
+        marginTop: 20,
         flexDirection: "row",
-        width: 300,
-        marginTop: -15
+        width: 300
     },
     textoGrande: {
         textAlign: "center",
-        marginHorizontal: 20,
+        marginHorizontal: 15,
         fontSize: 25,
         color: "#000"
     },

@@ -1,4 +1,4 @@
-import { useRouter } from "expo-router";
+import { Stack, useRouter } from "expo-router";
 import { BackHandler, Pressable, StyleSheet, Text, View } from "react-native";
 
 // Import de logoApp.svg
@@ -7,11 +7,12 @@ import LogoApp from "../assets/images/logoApp.svg";
 export default function Index() {
 
   const router = useRouter();
-  
+
   return (
     <View
       style={styles.container}
     >
+      <Stack.Screen options={{ headerShown: false }} />
       <LogoApp width={250} height={350} />
       <Text style={styles.texto}>¡El clásico juego del tres en raya ahora en tu dispositivo móvil!</Text>
       <View style={styles.contenedorBotones}>
@@ -31,6 +32,7 @@ export default function Index() {
 
 const styles = StyleSheet.create({
   container: {
+    marginTop: 40,
     flex: 1,
     alignItems: "center",
   },

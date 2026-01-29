@@ -1,4 +1,4 @@
-import { useLocalSearchParams, useRouter } from "expo-router";
+import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import { useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
@@ -11,6 +11,13 @@ export default function Partida() {
 
   const router = useRouter();
   const { nombre, dificultad } = useLocalSearchParams(); // Parámetro dificultad recibido del screen anterior
+
+  // Tiempo de juego
+  let tiempoJuego = 0;
+  let intervalo = 0;
+
+  iniciarTiempoJuego(); // Inicia el contador al entrar en la vista
+
 
   // Tablero
   const [tablero, setTablero] = useState([
@@ -45,7 +52,7 @@ export default function Partida() {
 
   // Turno de la IA
   function turnoIA(nuevoTablero: any) {
-    const nuevoTableroIA = nuevoTablero.map((filaArray) => [...filaArray]);
+    const nuevoTableroIA = nuevoTablero.map((filaArray: any) => [...filaArray]);
     for (let i = 0; i < 3; i++) {
       for (let j = 0; j < 3; j++) {
         if (nuevoTableroIA[i][j] === " ") { // Comprobación de celda vacía sobre el tablero nuevo
@@ -58,17 +65,32 @@ export default function Partida() {
     }
   }
 
+  // Contador tiempo
+  function iniciarTiempoJuego() {
+    intervalo = setInterval(() => {
+      if (tiempoJuego > 0) {
+        tiempoJuego++;
+      }
+    }, 1000);
+  }
+
   return (
     <View
       style={styles.container}
     >
+      <Stack.Screen options={{ headerShown: false }} />
       <LogoApp width={200} height={140} style={{ marginTop: 20 }} />
       <View style={styles.contenedorInfo}>
         <View style={styles.contenedor}>
           <Text style={styles.texto}>Tiempo: </Text>
+          <Text style={{ fontSize: 30, color: "#414141" }}>{tiempoJuego}</Text>
         </View>
         <View style={styles.contenedor}>
           <Text style={styles.texto}>Turno: </Text>
+          <View>
+            {esTurnoJugador && <CruzPeque width={30} height={30} />}
+            {!esTurnoJugador && <CirculoPeque width={30} height={30} />}
+          </View>
         </View>
       </View>
       <View style={styles.tablero}>
@@ -134,12 +156,13 @@ const styles = StyleSheet.create({
   },
   contenedorInfo: {
     alignItems: "center",
-    columnGap: 100,
+    columnGap: 70,
     flexDirection: "row",
     marginTop: 20
   },
   contenedor: {
     alignItems: "center",
+    justifyContent: "center",
     columnGap: 10,
     flexDirection: "row"
   },

@@ -1,4 +1,4 @@
-import { useLocalSearchParams, useRouter } from "expo-router";
+import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
 // Imports de SVG
@@ -15,6 +15,7 @@ export default function NuevaPartidaDificultad() {
         <View
             style={styles.container}
         >
+            <Stack.Screen options={{ headerShown: false }} />
             <View style={styles.contenedorSuperior}>
                 <BotonAtras width={20} height={20} onPress={() => router.push("/nueva_partida_nombre")} />
                 <LogoApp width={200} height={180} style={{ marginLeft: 30 }} />
@@ -48,7 +49,7 @@ const styles = StyleSheet.create({
     contenedorSuperior: {
         flexDirection: "row",
         width: 300,
-        marginTop: -30
+        marginTop: 9,
     },
     textoGrande: {
         textAlign: "center",
