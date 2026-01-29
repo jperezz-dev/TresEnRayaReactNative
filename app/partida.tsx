@@ -22,6 +22,41 @@ export default function Partida() {
   // Turnos
   const [esTurnoJugador, setTurnoJugador] = useState(true);
 
+  // Manejador click celda
+  function manejadorCeldas(fila: number, columna: number) {
+    if (esTurnoJugador && comprobarCeldaVacia(fila, columna)) {
+      const nuevoTablero = tablero.map((filaArray) => [...filaArray]); // Copia profunda del tablero
+      nuevoTablero[fila][columna] = "O"; // Modificación de celda en la copia
+      setTablero(nuevoTablero); // Actualización del tablero con los datos de la copia
+      setTurnoJugador(false); // Cambio de turno
+      turnoIA(nuevoTablero); // Llamada al turno de la IA
+    }
+  }
+
+  // Comprobación de si la celda está vacía
+  function comprobarCeldaVacia(fila: number, columna: number) {
+    if ((tablero[fila][columna]) == " ") {
+      return true;
+    }
+    else {
+      return false;
+    }
+  }
+
+  // Turno de la IA
+  function turnoIA(nuevoTablero: any) {
+    const nuevoTableroIA = nuevoTablero.map((filaArray) => [...filaArray]);
+    for (let i = 0; i < 3; i++) {
+      for (let j = 0; j < 3; j++) {
+        if (nuevoTableroIA[i][j] === " ") { // Comprobación de celda vacía sobre el tablero nuevo
+          nuevoTableroIA[i][j] = "X";
+          setTablero(nuevoTableroIA);
+          setTurnoJugador(true);
+          return;
+        }
+      }
+    }
+  }
 
   return (
     <View
@@ -37,15 +72,42 @@ export default function Partida() {
         </View>
       </View>
       <View style={styles.tablero}>
-        <View style={[styles.celda, {borderBottomWidth: 3}]} key={"celda00"}></View>
-        <View style={[styles.celda, {borderBottomWidth: 3, borderLeftWidth: 3, borderRightWidth: 3}]} key={"celda01"}></View>
-        <View style={[styles.celda, {borderBottomWidth: 3}]} key={"celda02"}></View>
-        <View style={[styles.celda, {borderBottomWidth: 3}]} key={"celda10"}></View>
-        <View style={[styles.celda, {borderBottomWidth: 3, borderLeftWidth: 3, borderRightWidth: 3}]} key={"celda11"}></View>
-        <View style={[styles.celda, {borderBottomWidth: 3}]} key={"celda12"}></View>
-        <View style={styles.celda} key={"celda20"}></View>
-        <View style={[styles.celda, {borderLeftWidth: 3, borderRightWidth: 3}]} key={"celda21"}></View>
-        <View style={styles.celda} key={"celda22"}></View>
+        <Pressable onPress={() => manejadorCeldas(0, 0)} style={[styles.celda, { borderBottomWidth: 3 }]}>
+          {tablero[0][0] === "O" && <CirculoPeque width={50} height={50} />}
+          {tablero[0][0] === "X" && <CruzPeque width={50} height={50} />}
+        </Pressable>
+        <Pressable onPress={() => manejadorCeldas(0, 1)} style={[styles.celda, { borderBottomWidth: 3, borderLeftWidth: 3, borderRightWidth: 3 }]}>
+          {tablero[0][1] === "O" && <CirculoPeque width={50} height={50} />}
+          {tablero[0][1] === "X" && <CruzPeque width={50} height={50} />}
+        </Pressable>
+        <Pressable onPress={() => manejadorCeldas(0, 2)} style={[styles.celda, { borderBottomWidth: 3 }]}>
+          {tablero[0][2] === "O" && <CirculoPeque width={50} height={50} />}
+          {tablero[0][2] === "X" && <CruzPeque width={50} height={50} />}
+        </Pressable>
+        <Pressable onPress={() => manejadorCeldas(1, 0)} style={[styles.celda, { borderBottomWidth: 3 }]}>
+          {tablero[1][0] === "O" && <CirculoPeque width={50} height={50} />}
+          {tablero[1][0] === "X" && <CruzPeque width={50} height={50} />}
+        </Pressable>
+        <Pressable onPress={() => manejadorCeldas(1, 1)} style={[styles.celda, { borderBottomWidth: 3, borderLeftWidth: 3, borderRightWidth: 3 }]}>
+          {tablero[1][1] === "O" && <CirculoPeque width={50} height={50} />}
+          {tablero[1][1] === "X" && <CruzPeque width={50} height={50} />}
+        </Pressable>
+        <Pressable onPress={() => manejadorCeldas(1, 2)} style={[styles.celda, { borderBottomWidth: 3 }]}>
+          {tablero[1][2] === "O" && <CirculoPeque width={50} height={50} />}
+          {tablero[1][2] === "X" && <CruzPeque width={50} height={50} />}
+        </Pressable>
+        <Pressable onPress={() => manejadorCeldas(2, 0)} style={styles.celda}>
+          {tablero[2][0] === "O" && <CirculoPeque width={50} height={50} />}
+          {tablero[2][0] === "X" && <CruzPeque width={50} height={50} />}
+        </Pressable>
+        <Pressable onPress={() => manejadorCeldas(2, 1)} style={[styles.celda, { borderLeftWidth: 3, borderRightWidth: 3 }]}>
+          {tablero[2][1] === "O" && <CirculoPeque width={50} height={50} />}
+          {tablero[2][1] === "X" && <CruzPeque width={50} height={50} />}
+        </Pressable>
+        <Pressable onPress={() => manejadorCeldas(2, 2)} style={styles.celda}>
+          {tablero[2][2] === "O" && <CirculoPeque width={50} height={50} />}
+          {tablero[2][2] === "X" && <CruzPeque width={50} height={50} />}
+        </Pressable>
       </View>
       <View style={styles.contenedor}>
         <View style={{ flexDirection: "row", marginRight: 40, columnGap: 15, alignItems: "center" }}>
