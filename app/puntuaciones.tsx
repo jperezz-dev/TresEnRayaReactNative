@@ -33,7 +33,7 @@ const styles = StyleSheet.create({
         alignItems: "center",
     },
     contenedorSuperior: {
-        marginTop: 30,
+        marginTop: 52,
         marginBottom: 80,
         flexDirection: "row",
         width: 300,

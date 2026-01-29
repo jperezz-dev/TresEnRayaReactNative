@@ -21,18 +21,20 @@ export default function NuevaPartidaDificultad() {
             </View>
             <Text style={styles.textoGrande}>Selecciona la dicultad de juego:</Text>
             <Text style={styles.texto}>En función de la dificultad seleccionada se aplicarán cambios al comportamiento de la IA.</Text>
-            <Pressable style={styles.boton} onPress={() => router.push({ // Envío de parámetros a la siguiente screen
-                pathname: "/partida",
-                params: { dificultad: "facil", nombre: nombre }
-            })}>
-                <Text style={styles.textoBoton}>Fácil</Text>
-            </Pressable>
-            <Pressable style={styles.boton} onPress={() => router.push({ // Envío de parámetros a la siguiente screen
-                pathname: "/partida",
-                params: { dificultad: "dificil", nombre: nombre }
-            })}>
-                <Text style={styles.textoBoton}>Difícil</Text>
-            </Pressable>
+            <View style={styles.contenedorBotones}>
+                <Pressable style={styles.boton} onPress={() => router.push({ // Envío de parámetros a la siguiente screen
+                    pathname: "/partida",
+                    params: { dificultad: "facil", nombre: nombre }
+                })}>
+                    <Text style={styles.textoBoton}>Fácil</Text>
+                </Pressable>
+                <Pressable style={styles.boton} onPress={() => router.push({ // Envío de parámetros a la siguiente screen
+                    pathname: "/partida",
+                    params: { dificultad: "dificil", nombre: nombre }
+                })}>
+                    <Text style={styles.textoBoton}>Difícil</Text>
+                </Pressable>
+            </View>
         </View>
     );
 }
@@ -46,6 +48,7 @@ const styles = StyleSheet.create({
     contenedorSuperior: {
         flexDirection: "row",
         width: 300,
+        marginTop: -30
     },
     textoGrande: {
         textAlign: "center",
@@ -66,6 +69,9 @@ const styles = StyleSheet.create({
         fontSize: 15,
         color: "#414141"
     },
+    contenedorBotones: {
+        rowGap: 20
+    },
     boton: {
         borderRadius: 30,
         backgroundColor: "#000000",
@@ -73,8 +79,7 @@ const styles = StyleSheet.create({
         width: 240,
         alignItems: "center",
         justifyContent: "center",
-        boxShadow: "1px 9px 5.800000190734863px 0px rgba(0, 0, 0, 24%)",
-        marginBottom: -20
+        boxShadow: "1px 9px 5.800000190734863px 0px rgba(0, 0, 0, 24%)"
     },
     botonInferior: {
         borderRadius: 30,
@@ -84,7 +89,6 @@ const styles = StyleSheet.create({
         alignItems: "center",
         justifyContent: "center",
         boxShadow: "1px 9px 5.800000190734863px 0px rgba(0, 0, 0, 24%)",
-        marginBottom: 80
     },
     textoBoton: {
         color: "#ffffff",

@@ -20,7 +20,7 @@ export default function NuevaPartidaNombre() {
                 <LogoApp width={200} height={180} style={{ marginLeft: 30 }} />
             </View>
             <Text style={styles.textoGrande}>Introduce tu nombre de jugador:</Text>
-            <TextInput style={styles.introducirTexto} placeholder="Introduce tu nombre..." onChangeText={(texto) => setNombre(texto)}></TextInput>
+            <TextInput style={styles.introducirTexto} placeholder=" Introduce tu nombre..." onChangeText={(texto) => setNombre(texto)}></TextInput>
             <Text style={styles.texto}>El nombre introducido es el que se mostrará en la tabla de resultados una vez finalice la partida.</Text>
             <Pressable style={styles.boton} onPress={() => router.push({
                 pathname: "/nueva_partida_dificultad",
@@ -41,7 +41,7 @@ const styles = StyleSheet.create({
     },
     contenedorSuperior: {
         flexDirection: "row",
-        width: 300,
+        width: 300
     },
     textoGrande: {
         textAlign: "center",

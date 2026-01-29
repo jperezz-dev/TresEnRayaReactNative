@@ -19,18 +19,20 @@ export default function PuntuacionesDificultad() {
             </View>
             <Text style={styles.textoGrande}>¿Que puntuaciones quieres visualizar?</Text>
             <Text style={styles.texto}>Las puntuaciones se almacenan de forma independiente en función de la dificultad de la partida.</Text>
-            <Pressable style={styles.boton} onPress={() => router.push({
-                pathname: "/puntuaciones",
-                params: { dificultad: "facil" }
-            })}>
-                <Text style={styles.textoBoton}>Fácil</Text>
-            </Pressable>
-            <Pressable style={styles.boton} onPress={() => router.push({
-                pathname: "/puntuaciones",
-                params: { dificultad: "dificil" }
-            })}>
-                <Text style={styles.textoBoton}>Difícil</Text>
-            </Pressable>
+            <View style={styles.contenedorBotones}>
+                <Pressable style={styles.boton} onPress={() => router.push({
+                    pathname: "/puntuaciones",
+                    params: { dificultad: "facil" }
+                })}>
+                    <Text style={styles.textoBoton}>Fácil</Text>
+                </Pressable>
+                <Pressable style={styles.boton} onPress={() => router.push({
+                    pathname: "/puntuaciones",
+                    params: { dificultad: "dificil" }
+                })}>
+                    <Text style={styles.textoBoton}>Difícil</Text>
+                </Pressable>
+            </View>
         </View>
     );
 }
@@ -44,6 +46,7 @@ const styles = StyleSheet.create({
     contenedorSuperior: {
         flexDirection: "row",
         width: 300,
+        marginTop: -15
     },
     textoGrande: {
         textAlign: "center",
@@ -63,6 +66,9 @@ const styles = StyleSheet.create({
         marginHorizontal: 30,
         fontSize: 15,
         color: "#414141"
+    },
+    contenedorBotones: {
+        rowGap: 40
     },
     boton: {
         borderRadius: 30,

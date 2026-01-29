@@ -44,10 +44,10 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: "column",
     width: 300,
-    marginTop: 20,
+    marginTop: 40,
     marginBottom: 20,
     alignItems: "center",
-    justifyContent: "space-evenly"
+    rowGap: 20
   },
   boton: {
     borderRadius: 30,
