@@ -1,6 +1,6 @@
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
-import { useState } from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { useEffect, useState } from "react";
+import { Modal, Pressable, StyleSheet, Text, View } from "react-native";
 
 // Imports de SVG
 import CirculoPeque from "../assets/images/circuloPeque.svg";
@@ -10,14 +10,32 @@ import LogoApp from "../assets/images/logoApp.svg";
 export default function Partida() {
 
   const router = useRouter();
+  const [modalVisible, setModalVisible] = useState(false); // Parámetro modal visible
+  const [mensajeResultado, setMensajeResultado] = useState(""); // Parámetro mensaje de final de partida
   const { nombre, dificultad } = useLocalSearchParams(); // Parámetro dificultad recibido del screen anterior
 
   // Tiempo de juego
-  let tiempoJuego = 0;
-  let intervalo = 0;
+  const [segundos, setSegundos] = useState(0);
 
-  iniciarTiempoJuego(); // Inicia el contador al entrar en la vista
+  // Tiempo formateado
+  const tiempoFormateado = (totalSegundos: number) => {
+    const minutos = Math.floor(totalSegundos / 60);
+    const segundosRestantes = totalSegundos % 60;
 
+    const minutosFormateados = minutos.toString().padStart(2, '0'); // Fuerza dos digitos aun que sea uno (Ej 5 -> 05)
+    const segundosFormateados = segundosRestantes.toString().padStart(2, '0'); // Fuerza dos digitos aun que sea uno (Ej 5 -> 05)
+
+    return `${minutosFormateados}:${segundosFormateados}`;
+  };
+
+  // Inicio de contador de tiempo
+  useEffect(() => {
+    const idIntervalo = setInterval(() => {
+      setSegundos((prev) => prev + 1);
+    }, 1000);
+
+    return () => clearInterval(idIntervalo);
+  }, []);
 
   // Tablero
   const [tablero, setTablero] = useState([
@@ -35,8 +53,12 @@ export default function Partida() {
       const nuevoTablero = tablero.map((filaArray) => [...filaArray]); // Copia profunda del tablero
       nuevoTablero[fila][columna] = "O"; // Modificación de celda en la copia
       setTablero(nuevoTablero); // Actualización del tablero con los datos de la copia
-      setTurnoJugador(false); // Cambio de turno
-      turnoIA(nuevoTablero); // Llamada al turno de la IA
+      if (!comprobarGanador(nuevoTablero)) { // Comprobación de victoria por cada turno
+        setTurnoJugador(false); // Cambio de turno
+        setTimeout(() => {
+          turnoIA(nuevoTablero); // Llamada al turno de la IA
+        }, 1000);
+      }
     }
   }
 
@@ -58,20 +80,82 @@ export default function Partida() {
         if (nuevoTableroIA[i][j] === " ") { // Comprobación de celda vacía sobre el tablero nuevo
           nuevoTableroIA[i][j] = "X";
           setTablero(nuevoTableroIA);
-          setTurnoJugador(true);
+          if (!comprobarGanador(nuevoTableroIA)) { // Comprobación de victoria por cada turno
+            setTurnoJugador(true); // Cambio de turno
+          }
           return;
         }
       }
     }
   }
 
-  // Contador tiempo
-  function iniciarTiempoJuego() {
-    intervalo = setInterval(() => {
-      if (tiempoJuego > 0) {
-        tiempoJuego++;
-      }
-    }, 1000);
+  // Función de reinicio de juego
+  function reiniciarJuego() {
+    const tableroReinicio = [
+      [" ", " ", " "],
+      [" ", " ", " "],
+      [" ", " ", " "]
+    ]
+
+    setTablero(tableroReinicio);  // Reinicio del tablero copiando la matriz
+    setSegundos(0); // Reinicio del tiempo
+  }
+
+  // Función de comprobación de ganador
+  function comprobarGanador(nuevoTablero: any) {
+    const nuevoTableroGanador = nuevoTablero.map((filaArray: any) => [...filaArray]);
+    if (
+      // Jugador gana linea en fila superior
+      nuevoTablero[0][0] === "O" && nuevoTablero[0][1] === "O" && nuevoTablero[0][2] === "O" ||
+      // Jugador gana linea del medio
+      nuevoTablero[1][0] === "O" && nuevoTablero[1][1] === "O" && nuevoTablero[1][2] === "O" ||
+      // Jugador gana linea inferior
+      nuevoTablero[2][0] === "O" && nuevoTablero[2][1] === "O" && nuevoTablero[2][2] === "O" ||
+      // Jugador gana linea izquierda
+      nuevoTablero[0][0] === "O" && nuevoTablero[1][0] === "O" && nuevoTablero[2][0] === "O" ||
+      // Jugador gana linea medio (Superior inferior)
+      nuevoTablero[0][1] === "O" && nuevoTablero[1][1] === "O" && nuevoTablero[2][1] === "O" ||
+      // Jugador gana linea derecha
+      nuevoTablero[0][2] === "O" && nuevoTablero[1][2] === "O" && nuevoTablero[2][2] === "O" ||
+      // Juagador gana diagonal 1
+      nuevoTablero[0][0] === "O" && nuevoTablero[1][1] === "O" && nuevoTablero[2][2] === "O" ||
+      // Jugador gana diagonal 2
+      nuevoTablero[2][0] === "O" && nuevoTablero[1][1] === "O" && nuevoTablero[0][2] === "O"
+    ) {
+      setMensajeResultado("¡Has ganado!");
+      setModalVisible(true);
+      return true;
+    }
+    else if (
+      // IA gana linea en fila superior
+      nuevoTablero[0][0] === "X" && nuevoTablero[0][1] === "X" && nuevoTablero[0][2] === "X" ||
+      // IA gana linea del medio
+      nuevoTablero[1][0] === "X" && nuevoTablero[1][1] === "X" && nuevoTablero[1][2] === "X" ||
+      // IA gana linea inferior
+      nuevoTablero[2][0] === "X" && nuevoTablero[2][1] === "X" && nuevoTablero[2][2] === "X" ||
+      // IA gana linea izquierda
+      nuevoTablero[0][0] === "X" && nuevoTablero[1][0] === "X" && nuevoTablero[2][0] === "X" ||
+      // IA gana linea medio (Superior inferior)
+      nuevoTablero[0][1] === "X" && nuevoTablero[1][1] === "X" && nuevoTablero[2][1] === "X" ||
+      // IA gana linea derecha
+      nuevoTablero[0][2] === "X" && nuevoTablero[1][2] === "X" && nuevoTablero[2][2] === "X" ||
+      // IA gana diagonal 1
+      nuevoTablero[0][0] === "X" && nuevoTablero[1][1] === "X" && nuevoTablero[2][2] === "X" ||
+      // IA gana diagonal 2
+      nuevoTablero[2][0] === "X" && nuevoTablero[1][1] === "X" && nuevoTablero[0][2] === "X"
+    ) {
+      setMensajeResultado("¡Has perdido!");
+      setModalVisible(true);
+      return true;
+
+    } else if (!nuevoTablero.flat().includes(" ")) { // Comprobación de que no haya espacios vacíos
+      setMensajeResultado("¡Empate!");
+      setModalVisible(true);
+      return true;
+    }
+    else {
+      return false;
+    }
   }
 
   return (
@@ -80,16 +164,36 @@ export default function Partida() {
     >
       <Stack.Screen options={{ headerShown: false }} />
       <LogoApp width={200} height={140} style={{ marginTop: 20 }} />
+      <Modal
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => setModalVisible(!modalVisible)}>
+        <View style={styles.fondoModal}>
+          <View style={styles.contenidoModal}>
+            <Text style={styles.texto}>{mensajeResultado}</Text>
+            <Pressable
+              style={[styles.boton, { marginBottom: 0 }]}
+              onPress={() => [setModalVisible(!modalVisible), reiniciarJuego()]}>
+              <Text style={styles.textoBoton}>Volver a jugar</Text>
+            </Pressable>
+            <Pressable
+              style={[styles.boton, { marginBottom: 0, marginTop: 20 }]}
+              onPress={() => [setModalVisible(!modalVisible), router.push("/")]}>
+              <Text style={styles.textoBoton}>Salir</Text>
+            </Pressable>
+          </View>
+        </View>
+      </Modal>
       <View style={styles.contenedorInfo}>
         <View style={styles.contenedor}>
           <Text style={styles.texto}>Tiempo: </Text>
-          <Text style={{ fontSize: 30, color: "#414141" }}>{tiempoJuego}</Text>
+          <Text style={{ fontSize: 30, color: "#414141" }}>{tiempoFormateado(segundos)}</Text>
         </View>
         <View style={styles.contenedor}>
           <Text style={styles.texto}>Turno: </Text>
           <View>
-            {esTurnoJugador && <CruzPeque width={30} height={30} />}
-            {!esTurnoJugador && <CirculoPeque width={30} height={30} />}
+            {esTurnoJugador && <CirculoPeque width={30} height={30} />}
+            {!esTurnoJugador && <CruzPeque width={30} height={30} />}
           </View>
         </View>
       </View>
@@ -166,6 +270,19 @@ const styles = StyleSheet.create({
     columnGap: 10,
     flexDirection: "row"
   },
+  fondoModal: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0,0,0,0.5)"
+  },
+  contenidoModal: {
+    backgroundColor: "#ffff",
+    borderRadius: 20,
+    alignContent: "center",
+    justifyContent: "center",
+    padding: 30
+  },
   tablero: {
     marginTop: 20,
     marginBottom: 20,
@@ -186,6 +303,7 @@ const styles = StyleSheet.create({
   },
   texto: {
     fontSize: 25,
+    textAlign: "center",
     color: "#000"
   },
   boton: {
