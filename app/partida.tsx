@@ -1,6 +1,7 @@
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import { Modal, Pressable, StyleSheet, Text, View } from "react-native";
+import { guardarPuntuacion as guardarEnDB } from "./db";
 
 // Imports de SVG
 import CirculoPeque from "../assets/images/circuloPeque.svg";
@@ -16,6 +17,7 @@ export default function Partida() {
 
   // Tiempo de juego
   const [segundos, setSegundos] = useState(0);
+
 
   // Tiempo formateado
   const tiempoFormateado = (totalSegundos: number) => {
@@ -47,257 +49,268 @@ export default function Partida() {
   // Turnos
   const [esTurnoJugador, setTurnoJugador] = useState(true);
 
-  // Manejador click celda
-  function manejadorCeldas(fila: number, columna: number) {
-    if (esTurnoJugador && comprobarCeldaVacia(fila, columna)) {
-      const nuevoTablero = tablero.map((filaArray) => [...filaArray]); // Copia profunda del tablero
-      nuevoTablero[fila][columna] = "O"; // Modificación de celda en la copia
-      setTablero(nuevoTablero); // Actualización del tablero con los datos de la copia
-      if (!comprobarGanador(nuevoTablero)) { // Comprobación de victoria por cada turno
-        setTurnoJugador(false); // Cambio de turno
-        setTimeout(() => {
-          if (dificultad == "facil") {
-            turnoIA(nuevoTablero); // Llamada al turno de la IA
-          }
-          else if (dificultad == "dificil") {
-            turnoIADificil(nuevoTablero); // Llamada al turno de la IA
-          }
-        }, 1000);
-      }
-    }
+  // Guardado de puntuación
+  const guardarPuntuacion = () => {
+    // Conversión a string primitivo
+    const nombreGuardar = String(nombre);
+    const dificultadGuardar = String(dificultad);
+    const tiempoGuardar = tiempoFormateado(segundos);
+
+    guardarEnDB(nombreGuardar, dificultadGuardar, tiempoGuardar);
   }
 
-  // Comprobación de si la celda está vacía
-  function comprobarCeldaVacia(fila: number, columna: number) {
-    if ((tablero[fila][columna]) == " ") {
-      return true;
-    }
-    else {
-      return false;
-    }
-  }
-
-  // Turno de la IA
-  function turnoIA(nuevoTablero: any) {
-    const nuevoTableroIA = nuevoTablero.map((filaArray: any) => [...filaArray]);
-    for (let i = 0; i < 3; i++) {
-      for (let j = 0; j < 3; j++) {
-        if (nuevoTableroIA[i][j] === " ") { // Comprobación de celda vacía sobre el tablero nuevo
-          nuevoTableroIA[i][j] = "X";
-          setTablero(nuevoTableroIA);
-          if (!comprobarGanador(nuevoTableroIA)) { // Comprobación de victoria por cada turno
-            setTurnoJugador(true); // Cambio de turno
-          }
-          return;
+// Manejador click celda
+function manejadorCeldas(fila: number, columna: number) {
+  if (esTurnoJugador && comprobarCeldaVacia(fila, columna)) {
+    const nuevoTablero = tablero.map((filaArray) => [...filaArray]); // Copia profunda del tablero
+    nuevoTablero[fila][columna] = "O"; // Modificación de celda en la copia
+    setTablero(nuevoTablero); // Actualización del tablero con los datos de la copia
+    if (!comprobarGanador(nuevoTablero)) { // Comprobación de victoria por cada turno
+      setTurnoJugador(false); // Cambio de turno
+      setTimeout(() => {
+        if (dificultad == "facil") {
+          turnoIA(nuevoTablero); // Llamada al turno de la IA
         }
-      }
-    }
-  }
-
-  function turnoIADificil(nuevoTablero: any) {
-    const nuevoTableroIA = nuevoTablero.map((filaArray: any) => [...filaArray]);
-    // Definición de lineas que se deben comprobar
-    const lineas = [
-      [[0, 0], [0, 1], [0, 2]], [[1, 0], [1, 1], [1, 2]], [[2, 0], [2, 1], [2, 2]], // Filas
-      [[0, 0], [1, 0], [2, 0]], [[0, 1], [1, 1], [2, 1]], [[0, 2], [1, 2], [2, 2]], // Columnas
-      [[0, 0], [1, 1], [2, 2]], [[0, 2], [1, 1], [2, 0]]                            // Diagonales
-    ];
-
-    const buscarCasilla = (ficha: string) => {
-      for (let linea of lineas) { // Recorre la lista de todas las combinaciones ganadoras posibles
-        const contenido = linea.map(([f, c]) => nuevoTableroIA[f][c]); // Comprueba el contenido de esas posiciones en el tablero
-        if (contenido.filter(x => x === ficha).length === 2 && contenido.includes(" ")) { // Comprueba que haya dos fichas iguales en esa posible linea ganadora y la tercera esté vacia (Ej: "X", "X", " ")
-          return linea[contenido.indexOf(" ")]; // En caso de cumplirse, devuelve esa celda
+        else if (dificultad == "dificil") {
+          turnoIADificil(nuevoTablero); // Llamada al turno de la IA
         }
-      }
-      return null;
-    };
-
-    // Lógica de decisión
-    let jugada = buscarCasilla("X"); // ¿Es posible ganar?
-    if (!jugada) {
-      jugada = buscarCasilla("O"); // Si no es posible ganar ¿Es posible que el jugador gane?
+      }, 1000);
     }
+  }
+}
 
-    if (!jugada) { // En caso de no haber jugada posible (ganar o bloquear), se busca una casilla vacía igual que en la dificultad fácil
-      for (let f = 0; f < 3; f++) {
-        for (let c = 0; c < 3; c++) {
-          if (nuevoTableroIA[f][c] === " ") { jugada = [f, c]; break; }
+// Comprobación de si la celda está vacía
+function comprobarCeldaVacia(fila: number, columna: number) {
+  if ((tablero[fila][columna]) == " ") {
+    return true;
+  }
+  else {
+    return false;
+  }
+}
+
+// Turno de la IA
+function turnoIA(nuevoTablero: any) {
+  const nuevoTableroIA = nuevoTablero.map((filaArray: any) => [...filaArray]);
+  for (let i = 0; i < 3; i++) {
+    for (let j = 0; j < 3; j++) {
+      if (nuevoTableroIA[i][j] === " ") { // Comprobación de celda vacía sobre el tablero nuevo
+        nuevoTableroIA[i][j] = "X";
+        setTablero(nuevoTableroIA);
+        if (!comprobarGanador(nuevoTableroIA)) { // Comprobación de victoria por cada turno
+          setTurnoJugador(true); // Cambio de turno
         }
-        if (jugada) break;
-      }
-    }
-
-    if (jugada) { // Una vez encontrada una jugada, sea la que sea se ejecuta
-      const [f, c] = jugada;
-      nuevoTableroIA[f][c] = "X";
-      setTablero(nuevoTableroIA);
-      if (!comprobarGanador(nuevoTableroIA)) {
-        setTurnoJugador(true);
+        return;
       }
     }
   }
+}
 
-  // Función de reinicio de juego
-  function reiniciarJuego() {
-    const tableroReinicio = [
-      [" ", " ", " "],
-      [" ", " ", " "],
-      [" ", " ", " "]
-    ]
+function turnoIADificil(nuevoTablero: any) {
+  const nuevoTableroIA = nuevoTablero.map((filaArray: any) => [...filaArray]);
+  // Definición de lineas que se deben comprobar
+  const lineas = [
+    [[0, 0], [0, 1], [0, 2]], [[1, 0], [1, 1], [1, 2]], [[2, 0], [2, 1], [2, 2]], // Filas
+    [[0, 0], [1, 0], [2, 0]], [[0, 1], [1, 1], [2, 1]], [[0, 2], [1, 2], [2, 2]], // Columnas
+    [[0, 0], [1, 1], [2, 2]], [[0, 2], [1, 1], [2, 0]]                            // Diagonales
+  ];
 
-    setTablero(tableroReinicio);  // Reinicio del tablero copiando la matriz
-    setSegundos(0); // Reinicio del tiempo
+  const buscarCasilla = (ficha: string) => {
+    for (let linea of lineas) { // Recorre la lista de todas las combinaciones ganadoras posibles
+      const contenido = linea.map(([f, c]) => nuevoTableroIA[f][c]); // Comprueba el contenido de esas posiciones en el tablero
+      if (contenido.filter(x => x === ficha).length === 2 && contenido.includes(" ")) { // Comprueba que haya dos fichas iguales en esa posible linea ganadora y la tercera esté vacia (Ej: "X", "X", " ")
+        return linea[contenido.indexOf(" ")]; // En caso de cumplirse, devuelve esa celda
+      }
+    }
+    return null;
+  };
+
+  // Lógica de decisión
+  let jugada = buscarCasilla("X"); // ¿Es posible ganar?
+  if (!jugada) {
+    jugada = buscarCasilla("O"); // Si no es posible ganar ¿Es posible que el jugador gane?
   }
 
-  // Función de comprobación de ganador
-  function comprobarGanador(nuevoTablero: any) {
-    if (
-      // Jugador gana linea en fila superior
-      nuevoTablero[0][0] === "O" && nuevoTablero[0][1] === "O" && nuevoTablero[0][2] === "O" ||
-      // Jugador gana linea del medio
-      nuevoTablero[1][0] === "O" && nuevoTablero[1][1] === "O" && nuevoTablero[1][2] === "O" ||
-      // Jugador gana linea inferior
-      nuevoTablero[2][0] === "O" && nuevoTablero[2][1] === "O" && nuevoTablero[2][2] === "O" ||
-      // Jugador gana linea izquierda
-      nuevoTablero[0][0] === "O" && nuevoTablero[1][0] === "O" && nuevoTablero[2][0] === "O" ||
-      // Jugador gana linea medio (Superior inferior)
-      nuevoTablero[0][1] === "O" && nuevoTablero[1][1] === "O" && nuevoTablero[2][1] === "O" ||
-      // Jugador gana linea derecha
-      nuevoTablero[0][2] === "O" && nuevoTablero[1][2] === "O" && nuevoTablero[2][2] === "O" ||
-      // Juagador gana diagonal 1
-      nuevoTablero[0][0] === "O" && nuevoTablero[1][1] === "O" && nuevoTablero[2][2] === "O" ||
-      // Jugador gana diagonal 2
-      nuevoTablero[2][0] === "O" && nuevoTablero[1][1] === "O" && nuevoTablero[0][2] === "O"
-    ) {
-      setMensajeResultado("¡Has ganado!");
-      setModalVisible(true);
-      return true;
-    }
-    else if (
-      // IA gana linea en fila superior
-      nuevoTablero[0][0] === "X" && nuevoTablero[0][1] === "X" && nuevoTablero[0][2] === "X" ||
-      // IA gana linea del medio
-      nuevoTablero[1][0] === "X" && nuevoTablero[1][1] === "X" && nuevoTablero[1][2] === "X" ||
-      // IA gana linea inferior
-      nuevoTablero[2][0] === "X" && nuevoTablero[2][1] === "X" && nuevoTablero[2][2] === "X" ||
-      // IA gana linea izquierda
-      nuevoTablero[0][0] === "X" && nuevoTablero[1][0] === "X" && nuevoTablero[2][0] === "X" ||
-      // IA gana linea medio (Superior inferior)
-      nuevoTablero[0][1] === "X" && nuevoTablero[1][1] === "X" && nuevoTablero[2][1] === "X" ||
-      // IA gana linea derecha
-      nuevoTablero[0][2] === "X" && nuevoTablero[1][2] === "X" && nuevoTablero[2][2] === "X" ||
-      // IA gana diagonal 1
-      nuevoTablero[0][0] === "X" && nuevoTablero[1][1] === "X" && nuevoTablero[2][2] === "X" ||
-      // IA gana diagonal 2
-      nuevoTablero[2][0] === "X" && nuevoTablero[1][1] === "X" && nuevoTablero[0][2] === "X"
-    ) {
-      setMensajeResultado("¡Has perdido!");
-      setModalVisible(true);
-      return true;
-
-    } else if (!nuevoTablero.flat().includes(" ")) { // Comprobación de que no haya espacios vacíos
-      setMensajeResultado("¡Empate!");
-      setModalVisible(true);
-      return true;
-    }
-    else {
-      return false;
+  if (!jugada) { // En caso de no haber jugada posible (ganar o bloquear), se busca una casilla vacía igual que en la dificultad fácil
+    for (let f = 0; f < 3; f++) {
+      for (let c = 0; c < 3; c++) {
+        if (nuevoTableroIA[f][c] === " ") { jugada = [f, c]; break; }
+      }
+      if (jugada) break;
     }
   }
 
-  return (
-    <View
-      style={styles.container}
-    >
-      <Stack.Screen options={{ headerShown: false }} />
-      <LogoApp width={200} height={140} style={{ marginTop: 20 }} />
-      <Modal
-        transparent={true}
-        visible={modalVisible}
-        onRequestClose={() => setModalVisible(!modalVisible)}>
-        <View style={styles.fondoModal}>
-          <View style={styles.contenidoModal}>
-            <Text style={styles.texto}>{mensajeResultado}</Text>
-            <Pressable
-              style={[styles.boton, { marginBottom: 0 }]}
-              onPress={() => [setModalVisible(!modalVisible), reiniciarJuego()]}>
-              <Text style={styles.textoBoton}>Volver a jugar</Text>
-            </Pressable>
-            <Pressable
-              style={[styles.boton, { marginBottom: 0, marginTop: 20 }]}
-              onPress={() => [setModalVisible(!modalVisible), router.push("/")]}>
-              <Text style={styles.textoBoton}>Salir</Text>
-            </Pressable>
-          </View>
-        </View>
-      </Modal>
-      <View style={styles.contenedorInfo}>
-        <View style={styles.contenedor}>
-          <Text style={styles.texto}>Tiempo: </Text>
-          <Text style={{ fontSize: 30, color: "#414141" }}>{tiempoFormateado(segundos)}</Text>
-        </View>
-        <View style={styles.contenedor}>
-          <Text style={styles.texto}>Turno: </Text>
-          <View>
-            {esTurnoJugador && <CirculoPeque width={30} height={30} />}
-            {!esTurnoJugador && <CruzPeque width={30} height={30} />}
-          </View>
+  if (jugada) { // Una vez encontrada una jugada, sea la que sea se ejecuta
+    const [f, c] = jugada;
+    nuevoTableroIA[f][c] = "X";
+    setTablero(nuevoTableroIA);
+    if (!comprobarGanador(nuevoTableroIA)) {
+      setTurnoJugador(true);
+    }
+  }
+}
+
+// Función de reinicio de juego
+function reiniciarJuego() {
+  const tableroReinicio = [
+    [" ", " ", " "],
+    [" ", " ", " "],
+    [" ", " ", " "]
+  ]
+
+  setTablero(tableroReinicio);  // Reinicio del tablero copiando la matriz
+  setSegundos(0); // Reinicio del tiempo
+}
+
+// Función de comprobación de ganador
+function comprobarGanador(nuevoTablero: any) {
+  if (
+    // Jugador gana linea en fila superior
+    nuevoTablero[0][0] === "O" && nuevoTablero[0][1] === "O" && nuevoTablero[0][2] === "O" ||
+    // Jugador gana linea del medio
+    nuevoTablero[1][0] === "O" && nuevoTablero[1][1] === "O" && nuevoTablero[1][2] === "O" ||
+    // Jugador gana linea inferior
+    nuevoTablero[2][0] === "O" && nuevoTablero[2][1] === "O" && nuevoTablero[2][2] === "O" ||
+    // Jugador gana linea izquierda
+    nuevoTablero[0][0] === "O" && nuevoTablero[1][0] === "O" && nuevoTablero[2][0] === "O" ||
+    // Jugador gana linea medio (Superior inferior)
+    nuevoTablero[0][1] === "O" && nuevoTablero[1][1] === "O" && nuevoTablero[2][1] === "O" ||
+    // Jugador gana linea derecha
+    nuevoTablero[0][2] === "O" && nuevoTablero[1][2] === "O" && nuevoTablero[2][2] === "O" ||
+    // Juagador gana diagonal 1
+    nuevoTablero[0][0] === "O" && nuevoTablero[1][1] === "O" && nuevoTablero[2][2] === "O" ||
+    // Jugador gana diagonal 2
+    nuevoTablero[2][0] === "O" && nuevoTablero[1][1] === "O" && nuevoTablero[0][2] === "O"
+  ) {
+    setMensajeResultado("¡Has ganado!");
+    setModalVisible(true);
+    guardarPuntuacion();
+    return true;
+  }
+  else if (
+    // IA gana linea en fila superior
+    nuevoTablero[0][0] === "X" && nuevoTablero[0][1] === "X" && nuevoTablero[0][2] === "X" ||
+    // IA gana linea del medio
+    nuevoTablero[1][0] === "X" && nuevoTablero[1][1] === "X" && nuevoTablero[1][2] === "X" ||
+    // IA gana linea inferior
+    nuevoTablero[2][0] === "X" && nuevoTablero[2][1] === "X" && nuevoTablero[2][2] === "X" ||
+    // IA gana linea izquierda
+    nuevoTablero[0][0] === "X" && nuevoTablero[1][0] === "X" && nuevoTablero[2][0] === "X" ||
+    // IA gana linea medio (Superior inferior)
+    nuevoTablero[0][1] === "X" && nuevoTablero[1][1] === "X" && nuevoTablero[2][1] === "X" ||
+    // IA gana linea derecha
+    nuevoTablero[0][2] === "X" && nuevoTablero[1][2] === "X" && nuevoTablero[2][2] === "X" ||
+    // IA gana diagonal 1
+    nuevoTablero[0][0] === "X" && nuevoTablero[1][1] === "X" && nuevoTablero[2][2] === "X" ||
+    // IA gana diagonal 2
+    nuevoTablero[2][0] === "X" && nuevoTablero[1][1] === "X" && nuevoTablero[0][2] === "X"
+  ) {
+    setMensajeResultado("¡Has perdido!");
+    setModalVisible(true);
+    return true;
+
+  } else if (!nuevoTablero.flat().includes(" ")) { // Comprobación de que no haya espacios vacíos
+    setMensajeResultado("¡Empate!");
+    setModalVisible(true);
+    return true;
+  }
+  else {
+    return false;
+  }
+}
+
+return (
+  <View
+    style={styles.container}
+  >
+    <Stack.Screen options={{ headerShown: false }} />
+    <LogoApp width={200} height={140} style={{ marginTop: 20 }} />
+    <Modal
+      transparent={true}
+      visible={modalVisible}
+      onRequestClose={() => setModalVisible(!modalVisible)}>
+      <View style={styles.fondoModal}>
+        <View style={styles.contenidoModal}>
+          <Text style={styles.texto}>{mensajeResultado}</Text>
+          <Pressable
+            style={[styles.boton, { marginBottom: 0 }]}
+            onPress={() => [setModalVisible(!modalVisible), reiniciarJuego()]}>
+            <Text style={styles.textoBoton}>Volver a jugar</Text>
+          </Pressable>
+          <Pressable
+            style={[styles.boton, { marginBottom: 0, marginTop: 20 }]}
+            onPress={() => [setModalVisible(!modalVisible), router.push("/")]}>
+            <Text style={styles.textoBoton}>Salir</Text>
+          </Pressable>
         </View>
       </View>
-      <View style={styles.tablero}>
-        <Pressable onPress={() => manejadorCeldas(0, 0)} style={[styles.celda, { borderBottomWidth: 3 }]}>
-          {tablero[0][0] === "O" && <CirculoPeque width={50} height={50} />}
-          {tablero[0][0] === "X" && <CruzPeque width={50} height={50} />}
-        </Pressable>
-        <Pressable onPress={() => manejadorCeldas(0, 1)} style={[styles.celda, { borderBottomWidth: 3, borderLeftWidth: 3, borderRightWidth: 3 }]}>
-          {tablero[0][1] === "O" && <CirculoPeque width={50} height={50} />}
-          {tablero[0][1] === "X" && <CruzPeque width={50} height={50} />}
-        </Pressable>
-        <Pressable onPress={() => manejadorCeldas(0, 2)} style={[styles.celda, { borderBottomWidth: 3 }]}>
-          {tablero[0][2] === "O" && <CirculoPeque width={50} height={50} />}
-          {tablero[0][2] === "X" && <CruzPeque width={50} height={50} />}
-        </Pressable>
-        <Pressable onPress={() => manejadorCeldas(1, 0)} style={[styles.celda, { borderBottomWidth: 3 }]}>
-          {tablero[1][0] === "O" && <CirculoPeque width={50} height={50} />}
-          {tablero[1][0] === "X" && <CruzPeque width={50} height={50} />}
-        </Pressable>
-        <Pressable onPress={() => manejadorCeldas(1, 1)} style={[styles.celda, { borderBottomWidth: 3, borderLeftWidth: 3, borderRightWidth: 3 }]}>
-          {tablero[1][1] === "O" && <CirculoPeque width={50} height={50} />}
-          {tablero[1][1] === "X" && <CruzPeque width={50} height={50} />}
-        </Pressable>
-        <Pressable onPress={() => manejadorCeldas(1, 2)} style={[styles.celda, { borderBottomWidth: 3 }]}>
-          {tablero[1][2] === "O" && <CirculoPeque width={50} height={50} />}
-          {tablero[1][2] === "X" && <CruzPeque width={50} height={50} />}
-        </Pressable>
-        <Pressable onPress={() => manejadorCeldas(2, 0)} style={styles.celda}>
-          {tablero[2][0] === "O" && <CirculoPeque width={50} height={50} />}
-          {tablero[2][0] === "X" && <CruzPeque width={50} height={50} />}
-        </Pressable>
-        <Pressable onPress={() => manejadorCeldas(2, 1)} style={[styles.celda, { borderLeftWidth: 3, borderRightWidth: 3 }]}>
-          {tablero[2][1] === "O" && <CirculoPeque width={50} height={50} />}
-          {tablero[2][1] === "X" && <CruzPeque width={50} height={50} />}
-        </Pressable>
-        <Pressable onPress={() => manejadorCeldas(2, 2)} style={styles.celda}>
-          {tablero[2][2] === "O" && <CirculoPeque width={50} height={50} />}
-          {tablero[2][2] === "X" && <CruzPeque width={50} height={50} />}
-        </Pressable>
+    </Modal>
+    <View style={styles.contenedorInfo}>
+      <View style={styles.contenedor}>
+        <Text style={styles.texto}>Tiempo: </Text>
+        <Text style={{ fontSize: 30, color: "#414141" }}>{tiempoFormateado(segundos)}</Text>
       </View>
       <View style={styles.contenedor}>
-        <View style={{ flexDirection: "row", marginRight: 40, columnGap: 15, alignItems: "center" }}>
-          <Text style={styles.texto}>Jugador</Text>
-          <CirculoPeque width={30} height={30}></CirculoPeque>
-        </View>
-        <View style={{ flexDirection: "row", columnGap: 15, alignItems: "center" }}>
-          <Text style={styles.texto}>IA</Text>
-          <CruzPeque width={30} height={30}></CruzPeque>
+        <Text style={styles.texto}>Turno: </Text>
+        <View>
+          {esTurnoJugador && <CirculoPeque width={30} height={30} />}
+          {!esTurnoJugador && <CruzPeque width={30} height={30} />}
         </View>
       </View>
-      <Pressable style={styles.boton} onPress={() => router.push("/")}>
-        <Text style={styles.textoBoton}>Salir</Text>
+    </View>
+    <View style={styles.tablero}>
+      <Pressable onPress={() => manejadorCeldas(0, 0)} style={[styles.celda, { borderBottomWidth: 3 }]}>
+        {tablero[0][0] === "O" && <CirculoPeque width={50} height={50} />}
+        {tablero[0][0] === "X" && <CruzPeque width={50} height={50} />}
+      </Pressable>
+      <Pressable onPress={() => manejadorCeldas(0, 1)} style={[styles.celda, { borderBottomWidth: 3, borderLeftWidth: 3, borderRightWidth: 3 }]}>
+        {tablero[0][1] === "O" && <CirculoPeque width={50} height={50} />}
+        {tablero[0][1] === "X" && <CruzPeque width={50} height={50} />}
+      </Pressable>
+      <Pressable onPress={() => manejadorCeldas(0, 2)} style={[styles.celda, { borderBottomWidth: 3 }]}>
+        {tablero[0][2] === "O" && <CirculoPeque width={50} height={50} />}
+        {tablero[0][2] === "X" && <CruzPeque width={50} height={50} />}
+      </Pressable>
+      <Pressable onPress={() => manejadorCeldas(1, 0)} style={[styles.celda, { borderBottomWidth: 3 }]}>
+        {tablero[1][0] === "O" && <CirculoPeque width={50} height={50} />}
+        {tablero[1][0] === "X" && <CruzPeque width={50} height={50} />}
+      </Pressable>
+      <Pressable onPress={() => manejadorCeldas(1, 1)} style={[styles.celda, { borderBottomWidth: 3, borderLeftWidth: 3, borderRightWidth: 3 }]}>
+        {tablero[1][1] === "O" && <CirculoPeque width={50} height={50} />}
+        {tablero[1][1] === "X" && <CruzPeque width={50} height={50} />}
+      </Pressable>
+      <Pressable onPress={() => manejadorCeldas(1, 2)} style={[styles.celda, { borderBottomWidth: 3 }]}>
+        {tablero[1][2] === "O" && <CirculoPeque width={50} height={50} />}
+        {tablero[1][2] === "X" && <CruzPeque width={50} height={50} />}
+      </Pressable>
+      <Pressable onPress={() => manejadorCeldas(2, 0)} style={styles.celda}>
+        {tablero[2][0] === "O" && <CirculoPeque width={50} height={50} />}
+        {tablero[2][0] === "X" && <CruzPeque width={50} height={50} />}
+      </Pressable>
+      <Pressable onPress={() => manejadorCeldas(2, 1)} style={[styles.celda, { borderLeftWidth: 3, borderRightWidth: 3 }]}>
+        {tablero[2][1] === "O" && <CirculoPeque width={50} height={50} />}
+        {tablero[2][1] === "X" && <CruzPeque width={50} height={50} />}
+      </Pressable>
+      <Pressable onPress={() => manejadorCeldas(2, 2)} style={styles.celda}>
+        {tablero[2][2] === "O" && <CirculoPeque width={50} height={50} />}
+        {tablero[2][2] === "X" && <CruzPeque width={50} height={50} />}
       </Pressable>
     </View>
-  );
+    <View style={styles.contenedor}>
+      <View style={{ flexDirection: "row", marginRight: 40, columnGap: 15, alignItems: "center" }}>
+        <Text style={styles.texto}>Jugador</Text>
+        <CirculoPeque width={30} height={30}></CirculoPeque>
+      </View>
+      <View style={{ flexDirection: "row", columnGap: 15, alignItems: "center" }}>
+        <Text style={styles.texto}>IA</Text>
+        <CruzPeque width={30} height={30}></CruzPeque>
+      </View>
+    </View>
+    <Pressable style={styles.boton} onPress={() => router.push("/")}>
+      <Text style={styles.textoBoton}>Salir</Text>
+    </Pressable>
+  </View>
+);
 }
 
 const styles = StyleSheet.create({

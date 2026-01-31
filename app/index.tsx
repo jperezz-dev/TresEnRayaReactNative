@@ -1,5 +1,7 @@
 import { Stack, useRouter } from "expo-router";
+import { useEffect } from "react";
 import { BackHandler, Pressable, StyleSheet, Text, View } from "react-native";
+import { inicializarDB as inicializarDBSQLite } from "./db";
 
 // Import de logoApp.svg
 import LogoApp from "../assets/images/logoApp.svg";
@@ -7,6 +9,14 @@ import LogoApp from "../assets/images/logoApp.svg";
 export default function Index() {
 
   const router = useRouter();
+
+  useEffect(() => {
+    try {
+      inicializarDBSQLite();
+    } catch (error) {
+      console.error("Error al inicializar DB:", error);
+    }
+  });
 
   return (
     <View
