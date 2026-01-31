@@ -160,6 +160,7 @@ function reiniciarJuego() {
 
   setTablero(tableroReinicio);  // Reinicio del tablero copiando la matriz
   setSegundos(0); // Reinicio del tiempo
+  setTurnoJugador(true);
 }
 
 // Función de comprobación de ganador
