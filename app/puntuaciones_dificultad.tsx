@@ -69,7 +69,8 @@ const styles = StyleSheet.create({
         color: "#414141"
     },
     contenedorBotones: {
-        rowGap: 40
+        rowGap: 20,
+        marginBottom: 30
     },
     boton: {
         borderRadius: 30,
@@ -78,8 +79,7 @@ const styles = StyleSheet.create({
         width: 240,
         alignItems: "center",
         justifyContent: "center",
-        boxShadow: "1px 9px 5.800000190734863px 0px rgba(0, 0, 0, 24%)",
-        marginBottom: -20
+        boxShadow: "1px 9px 5.800000190734863px 0px rgba(0, 0, 0, 24%)"
     },
     botonInferior: {
         borderRadius: 30,
@@ -88,8 +88,7 @@ const styles = StyleSheet.create({
         width: 240,
         alignItems: "center",
         justifyContent: "center",
-        boxShadow: "1px 9px 5.800000190734863px 0px rgba(0, 0, 0, 24%)",
-        marginBottom: 80
+        boxShadow: "1px 9px 5.800000190734863px 0px rgba(0, 0, 0, 24%)"
     },
     textoBoton: {
         color: "#ffffff",

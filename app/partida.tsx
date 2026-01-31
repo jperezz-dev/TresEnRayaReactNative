@@ -56,7 +56,12 @@ export default function Partida() {
       if (!comprobarGanador(nuevoTablero)) { // Comprobación de victoria por cada turno
         setTurnoJugador(false); // Cambio de turno
         setTimeout(() => {
-          turnoIA(nuevoTablero); // Llamada al turno de la IA
+          if (dificultad == "facil") {
+            turnoIA(nuevoTablero); // Llamada al turno de la IA
+          }
+          else if (dificultad == "dificil") {
+            turnoIADificil(nuevoTablero); // Llamada al turno de la IA
+          }
         }, 1000);
       }
     }
@@ -89,6 +94,50 @@ export default function Partida() {
     }
   }
 
+  function turnoIADificil(nuevoTablero: any) {
+    const nuevoTableroIA = nuevoTablero.map((filaArray: any) => [...filaArray]);
+    // Definición de lineas que se deben comprobar
+    const lineas = [
+      [[0, 0], [0, 1], [0, 2]], [[1, 0], [1, 1], [1, 2]], [[2, 0], [2, 1], [2, 2]], // Filas
+      [[0, 0], [1, 0], [2, 0]], [[0, 1], [1, 1], [2, 1]], [[0, 2], [1, 2], [2, 2]], // Columnas
+      [[0, 0], [1, 1], [2, 2]], [[0, 2], [1, 1], [2, 0]]                            // Diagonales
+    ];
+
+    const buscarCasilla = (ficha: string) => {
+      for (let linea of lineas) { // Recorre la lista de todas las combinaciones ganadoras posibles
+        const contenido = linea.map(([f, c]) => nuevoTableroIA[f][c]); // Comprueba el contenido de esas posiciones en el tablero
+        if (contenido.filter(x => x === ficha).length === 2 && contenido.includes(" ")) { // Comprueba que haya dos fichas iguales en esa posible linea ganadora y la tercera esté vacia (Ej: "X", "X", " ")
+          return linea[contenido.indexOf(" ")]; // En caso de cumplirse, devuelve esa celda
+        }
+      }
+      return null;
+    };
+
+    // Lógica de decisión
+    let jugada = buscarCasilla("X"); // ¿Es posible ganar?
+    if (!jugada) {
+      jugada = buscarCasilla("O"); // Si no es posible ganar ¿Es posible que el jugador gane?
+    }
+
+    if (!jugada) { // En caso de no haber jugada posible (ganar o bloquear), se busca una casilla vacía igual que en la dificultad fácil
+      for (let f = 0; f < 3; f++) {
+        for (let c = 0; c < 3; c++) {
+          if (nuevoTableroIA[f][c] === " ") { jugada = [f, c]; break; }
+        }
+        if (jugada) break;
+      }
+    }
+
+    if (jugada) { // Una vez encontrada una jugada, sea la que sea se ejecuta
+      const [f, c] = jugada;
+      nuevoTableroIA[f][c] = "X";
+      setTablero(nuevoTableroIA);
+      if (!comprobarGanador(nuevoTableroIA)) {
+        setTurnoJugador(true);
+      }
+    }
+  }
+
   // Función de reinicio de juego
   function reiniciarJuego() {
     const tableroReinicio = [
@@ -103,7 +152,6 @@ export default function Partida() {
 
   // Función de comprobación de ganador
   function comprobarGanador(nuevoTablero: any) {
-    const nuevoTableroGanador = nuevoTablero.map((filaArray: any) => [...filaArray]);
     if (
       // Jugador gana linea en fila superior
       nuevoTablero[0][0] === "O" && nuevoTablero[0][1] === "O" && nuevoTablero[0][2] === "O" ||
@@ -260,9 +308,9 @@ const styles = StyleSheet.create({
   },
   contenedorInfo: {
     alignItems: "center",
-    columnGap: 70,
+    columnGap: 30,
     flexDirection: "row",
-    marginTop: 20
+    marginTop: 20,
   },
   contenedor: {
     alignItems: "center",

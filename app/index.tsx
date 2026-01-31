@@ -38,6 +38,7 @@ const styles = StyleSheet.create({
   },
   texto: {
     textAlign: "center",
+    marginTop: 30,
     marginHorizontal: 50,
     fontSize: 20,
     color: "#414141"
@@ -46,7 +47,7 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: "column",
     width: 300,
-    marginTop: 40,
+    marginTop: 60,
     marginBottom: 20,
     alignItems: "center",
     rowGap: 20
