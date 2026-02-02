@@ -1,65 +1,64 @@
-# Welcome to your Expo app 👋
+# Tic-tac-toe
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Tic-Tac-Toe es una aplicación móvil interactiva desarrollada con React Native y Expo. Este proyecto traslada el clásico juego de estrategia a una experiencia moderna y fluida, ofreciendo diferentes niveles de dificultad contra una IA inteligente y un sistema de persistencia de datos local para registrar los mejores tiempos de los jugadores.
 
-## Get started
+---
 
-To start the app, in your terminal run:
+## Características principales:
 
-```bash
-npm run start
-```
+- **Dificultad Adaptativa de la IA:** Implementación de dos niveles de inteligencia artificial. El modo "Fácil" utiliza una lógica de búsqueda secuencial, mientras que el modo "Difícil" emplea algoritmos de decisión para bloquear jugadas del usuario y priorizar sus propias victorias.
 
-In the output, you'll find options to open the app in:
+- **Persistencia de Datos con SQLite:** Integración de la librería expo-sqlite para el almacenamiento persistente. Las puntuaciones (nombre, tiempo y dificultad) se guardan de forma local, permitiendo consultar rankings históricos incluso tras cerrar la aplicación.
 
-- [a development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [an Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [an iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+- **Gestión de Estado Compleja:** Control preciso del flujo de la partida mediante hooks de React (useState, useEffect), gestionando turnos alternos entre jugador e IA, detección de victorias, empates y limpieza de temporizadores.
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+- **Navegación Fluida con Expo Router:** Arquitectura basada en un sistema de rutas de archivos, facilitando la transición entre pantallas (Menú, Configuración, Partida y Puntuaciones) y el paso de parámetros entre ellas.
 
-## Workflows
+- **Interfaz de Usuario Limpia y Moderna:** Diseño UI minimalista que utiliza componentes nativos y gráficos vectoriales (SVG) para garantizar una visualización nítida en cualquier resolución de pantalla móvil.
 
-This project is configured to use [EAS Workflows](https://docs.expo.dev/eas/workflows/get-started/) to automate some development and release processes. These commands are set up in [`package.json`](./package.json) and can be run using NPM scripts in your terminal.
+- **Sistema de Temporizador en Tiempo Real:** Seguimiento preciso de la duración de cada partida, formateando milisegundos en una interfaz amigable (MM:SS).
 
-### Previews
+- **Experiencia de Usuario Dinámica:** Uso de modales interactivos para mostrar resultados de la partida y facilitar el reinicio rápido del juego o la navegación al menú principal sin interrumpir la experiencia.
 
-Run `npm run draft` to [publish a preview update](https://docs.expo.dev/eas/workflows/examples/publish-preview-update/) of your project, which can be viewed in Expo Go or in a development build.
+---
 
-### Development Builds
+## Diseño en figma
 
-Run `npm run development-builds` to [create a development build](https://docs.expo.dev/eas/workflows/examples/create-development-builds/). Note - you'll need to follow the [Prerequisites](https://docs.expo.dev/eas/workflows/examples/create-development-builds/#prerequisites) to ensure you have the correct emulator setup on your machine.
+https://www.figma.com/design/ly1gCOVXNZNKMHY2hmbYNp/tresEnRaya?node-id=0-1&t=wJl0AU37APHe6tCi-1
 
-### Production Deployments
+---
 
-Run `npm run deploy` to [deploy to production](https://docs.expo.dev/eas/workflows/examples/deploy-to-production/). Note - you'll need to follow the [Prerequisites](https://docs.expo.dev/eas/workflows/examples/deploy-to-production/#prerequisites) to ensure you're set up to submit to the Apple and Google stores.
+## Tecnologías utilizadas:
 
-## Hosting
+- **Framework:** React Native (Expo)
 
-Expo offers hosting for websites and API functions via EAS Hosting. See the [Getting Started](https://docs.expo.dev/eas/hosting/get-started/) guide to learn more.
+- **Navegación:** Expo Router
 
+- **Lenguaje principal:** TypeScript y JavaScript
 
-## Get a fresh project
+- **Base de Datos:** SQLite (expo-sqlite)
 
-When you're ready, run:
+---
 
-```bash
-npm run reset-project
-```
+## Imágenes en ejecución:
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+### Menú Principal
 
-## Learn more
+![alt text](imagenes/imagen1.png)
 
-To learn more about developing your project with Expo, look at the following resources:
+### Selección de nombre
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+![alt text](imagenes/imagen2.png)
 
-## Join the community
+### Gameplay (Partida en curso)
 
-Join our community of developers creating universal apps.
+![alt text](imagenes/imagen3.png)
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+### Resultado y opciones
+
+![alt text](imagenes/imagen4.png)
+
+### Tabla de Puntuaciones
+
+![alt text](imagenes/imagen5.png)
+![alt text](imagenes/imagen6.png)
